@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blandify</title>
+<style>
+body{background:#faf9f6;color:#111;font-family:Inter,Arial,sans-serif;margin:0}
+.container{max-width:1100px;margin:40px auto;padding:30px}
+.header{display:flex;align-items:center;gap:14px}.header img{height:46px}.logo{font-family:Georgia,serif;font-size:64px}
+.tag{font-size:13px;color:#555}.desc{font-family:Georgia,serif;font-size:30px;margin:20px 0 30px}
+.comparison{display:flex;gap:24px}.panel{flex:1}.title{font-size:12px;text-transform:uppercase;color:#666;margin-bottom:8px}
+textarea,#output{width:100%;min-height:180px;border:1px solid #111;padding:18px;box-sizing:border-box;background:#fff}
+#output{font-family:Georgia,serif}
+button{margin:24px 0 10px;padding:14px 34px;background:#111;color:#fff;border:0;cursor:pointer}
+#loading{min-height:28px;font-style:italic;color:#555}
+#report{margin-top:28px;border:1px solid #ddd;padding:18px;font-size:14px;display:none}
+</style></head>
+<body><div class="container">
+<div class="header"><img src="logo.png" onerror="this.style.display='none'"><div class="logo">Blandify</div></div>
+<div class="tag">Kill personality. Squash nuance. Depress emotion.</div>
+<div class="desc">Blandify helps you sound like everyone else.</div>
+
+<div class="comparison">
+<div class="panel">
+<div class="title">Original</div>
+<textarea id="text" placeholder="Paste your writing to begin"></textarea>
+</div>
+<div class="panel">
+<div class="title">Blandified</div>
+<div id="output">Your optimised communication will appear here.</div>
+</div>
+</div>
+
+<button onclick="blandify()">Click to conform</button>
+<div id="loading"></div>
+
+<div id="report"></div>
+
+<script>
+const messages=[
+"Initialising language model...",
+"Detecting personality...",
+"Removing human characteristics...",
+"Replacing specific thoughts with scalable concepts...",
+"Aligning tone with industry expectations...",
+"Finalising acceptable output..."
+];
+
+async function blandifyText(input){
+return `This isn't ${input.split(/\s+/)[0]||"writing"}. It's a new way of communicating.
+
+Overall, it is important to note that, in today's fast-paced landscape, leveraging best-practice communication frameworks enables meaningful outcomes across a range of stakeholders.`;
+}
+
+async function blandify(){
+const loading=document.getElementById("loading");
+const output=document.getElementById("output");
+const report=document.getElementById("report");
+report.style.display="none";
+for(const m of messages){
+ loading.textContent=m;
+ await new Promise(r=>setTimeout(r,650));
+}
+loading.textContent="✓ Blandification complete.";
+await new Promise(r=>setTimeout(r,900));
+output.textContent=await blandifyText(document.getElementById("text").value);
+report.innerHTML="<strong>Humanity remaining:</strong> 4%<br><strong>Personality detected:</strong> MINIMAL<br><strong>Nuance removed:</strong> 98%<br><strong>Generic alignment:</strong> OPTIMAL<br><br><strong>Ready to post on LinkedIn.</strong>";
+report.style.display="block";
+loading.textContent="";
+}
+</script>
+</div></body></html>
