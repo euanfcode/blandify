@@ -1,70 +1,46 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blandify</title>
-<style>
-body{background:#faf9f6;color:#111;font-family:Inter,Arial,sans-serif;margin:0}
-.container{max-width:1100px;margin:40px auto;padding:30px}
-.header{display:flex;align-items:center;gap:14px}.header img{height:46px}.logo{font-family:Georgia,serif;font-size:64px}
-.tag{font-size:13px;color:#555}.desc{font-family:Georgia,serif;font-size:30px;margin:20px 0 30px}
-.comparison{display:flex;gap:24px}.panel{flex:1}.title{font-size:12px;text-transform:uppercase;color:#666;margin-bottom:8px}
-textarea,#output{width:100%;min-height:180px;border:1px solid #111;padding:18px;box-sizing:border-box;background:#fff}
-#output{font-family:Georgia,serif}
-button{margin:24px 0 10px;padding:14px 34px;background:#111;color:#fff;border:0;cursor:pointer}
-#loading{min-height:28px;font-style:italic;color:#555}
-#report{margin-top:28px;border:1px solid #ddd;padding:18px;font-size:14px;display:none}
-</style></head>
-<body><div class="container">
-<div class="header"><img src="logo.png" onerror="this.style.display='none'"><div class="logo">Blandify</div></div>
-<div class="tag">Kill personality. Squash nuance. Depress emotion.</div>
-<div class="desc">Blandify helps you sound like everyone else.</div>
-
-<div class="comparison">
-<div class="panel">
-<div class="title">Original</div>
-<textarea id="text" placeholder="Paste your writing to begin"></textarea>
-</div>
-<div class="panel">
-<div class="title">Blandified</div>
-<div id="output">Your optimised communication will appear here.</div>
-</div>
-</div>
-
-<button onclick="blandify()">Click to conform</button>
-<div id="loading"></div>
-
-<div id="report"></div>
-
-<script>
-const messages=[
-"Initialising language model...",
-"Detecting personality...",
-"Removing human characteristics...",
-"Replacing specific thoughts with scalable concepts...",
-"Aligning tone with industry expectations...",
-"Finalising acceptable output..."
-];
-
-async function blandifyText(input){
-return `This isn't ${input.split(/\s+/)[0]||"writing"}. It's a new way of communicating.
-
-Overall, it is important to note that, in today's fast-paced landscape, leveraging best-practice communication frameworks enables meaningful outcomes across a range of stakeholders.`;
-}
-
-async function blandify(){
-const loading=document.getElementById("loading");
-const output=document.getElementById("output");
-const report=document.getElementById("report");
-report.style.display="none";
-for(const m of messages){
- loading.textContent=m;
- await new Promise(r=>setTimeout(r,650));
-}
-loading.textContent="✓ Blandification complete.";
-await new Promise(r=>setTimeout(r,900));
-output.textContent=await blandifyText(document.getElementById("text").value);
-report.innerHTML="<strong>Humanity remaining:</strong> 4%<br><strong>Personality detected:</strong> MINIMAL<br><strong>Nuance removed:</strong> 98%<br><strong>Generic alignment:</strong> OPTIMAL<br><br><strong>Ready to post on LinkedIn.</strong>";
-report.style.display="block";
-loading.textContent="";
-}
-</script>
-</div></body></html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Blandify helps you sound like everyone else.">
+  <title>Blandify</title>
+  <style>
+    :root{--background:#f7f5ef;--panel:#fbfaf7;--text:#111;--muted:#686868;--border:#1b1b1b;--soft-border:#d8d5cc}*{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--text);font-family:Arial,Helvetica,sans-serif}main{width:min(1120px,calc(100% - 40px));margin:0 auto;padding:48px 0 64px}.brand{display:flex;align-items:center;gap:14px}.brand img{width:48px;height:48px;object-fit:contain}h1,.statement,#output{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif}h1{margin:0;font-size:clamp(52px,8vw,82px);font-weight:500;letter-spacing:-.04em;line-height:.95}.tagline{margin:15px 0 0;color:var(--muted);font-size:13px;letter-spacing:.02em}.statement{max-width:720px;margin:32px 0 42px;font-size:clamp(28px,4vw,43px);line-height:1.05;letter-spacing:-.025em}.workspace{display:grid;grid-template-columns:1fr 1fr;gap:22px}.panel-heading{display:flex;justify-content:space-between;gap:16px;margin-bottom:9px;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}textarea,#output{display:block;width:100%;min-height:270px;padding:22px;border:1px solid var(--border);border-radius:0;background:var(--panel);color:var(--text)}textarea{resize:vertical;font:inherit;font-size:16px;line-height:1.55}textarea:focus{outline:2px solid var(--text);outline-offset:3px}#output{overflow-wrap:anywhere;white-space:pre-wrap;font-size:23px;line-height:1.32}#output.empty{color:#88867f}.actions{display:flex;align-items:center;gap:14px;margin-top:24px}button{border:1px solid var(--text);border-radius:0;padding:14px 24px;background:var(--text);color:#fff;font:inherit;font-size:14px;cursor:pointer}button:hover{background:transparent;color:var(--text)}button:disabled{cursor:wait;opacity:.5}#copyButton{display:none;background:transparent;color:var(--text)}#copyButton:hover{background:var(--text);color:#fff}#status{min-height:22px;margin-top:18px;color:var(--muted);font-family:Georgia,"Times New Roman",serif;font-size:15px;font-style:italic}#error{display:none;margin-top:16px;font-size:14px}#report{display:none;max-width:540px;margin-top:28px;border:1px solid var(--soft-border);padding:20px;font-size:13px;line-height:1.8}#report dl{display:grid;grid-template-columns:1fr auto;gap:4px 24px;margin:0}#report dt,#report dd{margin:0}#report dd{font-weight:700}.linkedin{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--soft-border);font-weight:700}@media(max-width:760px){main{width:min(100% - 28px,1120px);padding-top:30px}.workspace{grid-template-columns:1fr}textarea,#output{min-height:220px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand"><img src="logo.png" alt="" onerror="this.remove()"><h1>Blandify</h1></div>
+      <p class="tagline">Kill personality. Squash nuance. Depress emotion.</p>
+      <p class="statement">Blandify helps you sound like everyone else.</p>
+    </header>
+    <section class="workspace" aria-label="Blandify writing tool">
+      <div>
+        <div class="panel-heading"><span>Original</span><span id="wordCount">0 / 250 words</span></div>
+        <textarea id="input" maxlength="2500" placeholder="Paste your writing to begin" aria-label="Original writing"></textarea>
+      </div>
+      <div>
+        <div class="panel-heading"><span>Blandified</span></div>
+        <div id="output" class="empty" aria-live="polite">Your optimised communication will appear here.</div>
+      </div>
+    </section>
+    <div class="actions"><button id="blandifyButton" type="button">Click to conform</button><button id="copyButton" type="button">Copy</button></div>
+    <div id="status" aria-live="polite"></div><div id="error" role="alert"></div>
+    <aside id="report"><dl><dt>Humanity remaining</dt><dd>4%</dd><dt>Personality detected</dt><dd>MINIMAL</dd><dt>Nuance removed</dt><dd>98%</dd><dt>Generic alignment</dt><dd>OPTIMAL</dd></dl><p class="linkedin">Ready to post on LinkedIn.</p></aside>
+  </main>
+  <script>
+    const input=document.querySelector('#input'),output=document.querySelector('#output'),wordCount=document.querySelector('#wordCount'),blandifyButton=document.querySelector('#blandifyButton'),copyButton=document.querySelector('#copyButton'),status=document.querySelector('#status'),error=document.querySelector('#error'),report=document.querySelector('#report');
+    const loadingMessages=['Initialising language model...','Detecting personality...','Removing human characteristics...','Flattening emotional variance...','Standardising communication patterns...','Optimising for professional ambiguity...','Finalising acceptable output...'];
+    const countWords=value=>{const t=value.trim();return t?t.split(/\s+/).length:0};
+    function updateWordCount(){const words=countWords(input.value);wordCount.textContent=`${words} / 250 words`;wordCount.style.fontWeight=words>250?'700':'400'}
+    const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+    async function runLoadingSequence(){for(const message of loadingMessages){status.textContent=message;await wait(430)}}
+    async function blandifyText(text){const response=await fetch('/api/blandify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Blandification failed.');return data.text}
+    async function handleBlandify(){const text=input.value.trim(),words=countWords(text);error.style.display='none';report.style.display='none';copyButton.style.display='none';if(!text){error.textContent='Paste some writing first.';error.style.display='block';input.focus();return}if(words>250){error.textContent='Please keep the original to 250 words or fewer.';error.style.display='block';input.focus();return}blandifyButton.disabled=true;output.classList.add('empty');output.textContent='Conformity pending...';try{const loadingPromise=runLoadingSequence(),blandifiedPromise=blandifyText(text);const[,blandified]=await Promise.all([loadingPromise,blandifiedPromise]);status.textContent='✓ Blandification complete.';await wait(700);output.textContent=blandified;output.classList.remove('empty');report.style.display='block';copyButton.style.display='inline-block';status.textContent=''}catch(caughtError){output.textContent='Your optimised communication will appear here.';output.classList.add('empty');status.textContent='';error.textContent=caughtError.message;error.style.display='block'}finally{blandifyButton.disabled=false}}
+    async function handleCopy(){await navigator.clipboard.writeText(output.textContent);copyButton.textContent='Copied';setTimeout(()=>copyButton.textContent='Copy',1400)}
+    input.addEventListener('input',updateWordCount);blandifyButton.addEventListener('click',handleBlandify);copyButton.addEventListener('click',handleCopy);updateWordCount();
+  </script>
+</body>
+</html>
