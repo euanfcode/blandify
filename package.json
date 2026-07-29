@@ -1,0 +1,8 @@
+{
+  "name": "blandify",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "dependencies": { "openai": "^5.20.0" }
+}
