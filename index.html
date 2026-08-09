@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Blandify helps you sound like everyone else." name="description"/>
+<title>Blandify</title>
+<style>
+:root{
+  --background:#f7f5ef;
+  --panel:#fbfaf7;
+  --text:#111;
+  --muted:#686868;
+  --border:#1b1b1b;
+  --soft-border:#d8d5cc;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--background);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+main{
+  width:min(1180px,calc(100% - 40px));
+  margin:0 auto;
+  padding:42px 0 56px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-bottom:56px;
+}
+
+.brand img{
+  width:72px;
+  height:72px;
+  object-fit:contain;
+}
+
+h1,#output{
+  font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(56px,8vw,86px);
+  font-weight:500;
+  letter-spacing:-.04em;
+  line-height:.95;
+}
+
+.workspace{
+  display:grid;
+  grid-template-columns:1fr 110px 1fr;
+  gap:24px;
+  align-items:center;
+}
+
+textarea,#output{
+  display:block;
+  width:100%;
+  height:300px;
+  min-height:300px;
+  padding:22px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+}
+
+textarea{
+  resize:none;
+  overflow-y:auto;
+  font:inherit;
+  font-size:16px;
+  line-height:1.55;
+}
+
+textarea:focus{
+  outline:2px solid var(--text);
+  outline-offset:3px;
+}
+
+#output{
+  overflow-y:auto;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+  font-size:23px;
+  line-height:1.32;
+}
+
+#output.empty{
+  color:#88867f;
+}
+
+/* Centre Blandify mark: always visible, never touching either box */
+#processingMark{
+  height:300px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+
+#processingMark img{
+  width:96px;
+  height:96px;
+  object-fit:contain;
+  opacity:.9;
+  transform:translateY(0) rotate(0deg) scale(1);
+}
+
+#processingMark.is-processing img{
+  animation:blandifyProcessing 2.25s ease-in-out infinite;
+}
+
+@keyframes blandifyProcessing{
+  0%,100%{
+    opacity:.72;
+    transform:translateY(0) rotate(0deg) scale(.96);
+  }
+  50%{
+    opacity:1;
+    transform:translateY(-6px) rotate(7deg) scale(1.08);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  #processingMark.is-processing img{
+    animation:none;
+    opacity:1;
+  }
+}
+
+.actions{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:22px;
+}
+
+button{
+  border:1px solid var(--text);
+  padding:14px 24px;
+  background:var(--text);
+  color:#fff;
+  font:inherit;
+  font-size:14px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:transparent;
+  color:var(--text);
+}
+
+button:disabled{
+  cursor:wait;
+  opacity:.5;
+}
+
+#copyButton{
+  display:none;
+  background:transparent;
+  color:var(--text);
+}
+
+#copyButton:hover{
+  background:var(--text);
+  color:#fff;
+}
+
+#status{
+  min-height:22px;
+  margin-top:18px;
+  color:var(--muted);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:15px;
+  font-style:italic;
+}
+
+#error{
+  display:none;
+  margin-top:16px;
+  font-size:14px;
+}
+
+#report{
+  display:none;
+  max-width:540px;
+  margin-top:26px;
+  border:1px solid var(--soft-border);
+  padding:18px;
+  font-size:13px;
+  line-height:1.8;
+}
+
+#report dl{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:4px 24px;
+  margin:0;
+}
+
+#report dt,#report dd{margin:0}
+#report dd{font-weight:700}
+
+.linkedin{
+  margin:16px 0 0;
+  padding-top:14px;
+  border-top:1px solid var(--soft-border);
+  font-weight:700;
+}
+
+@media(max-width:760px){
+  main{
+    width:min(100% - 28px,1180px);
+    padding-top:28px;
+  }
+
+  .brand{
+    margin-bottom:36px;
+  }
+
+  .brand img{
+    width:60px;
+    height:60px;
+  }
+
+  .workspace{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+
+  #processingMark{
+    height:80px;
+  }
+
+  #processingMark img{
+    width:72px;
+    height:72px;
+  }
+
+  textarea,#output{
+    height:230px;
+    min-height:230px;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="brand"><img alt="" onerror="this.remove()" src="logo.png"/><h1>Blandify</h1></div>
+</header>
+<section aria-label="Blandify writing tool" class="workspace">
+<div>
+<textarea aria-label="Original writing" id="input" maxlength="2500" placeholder="Paste your writing to begin"></textarea>
+</div><div aria-hidden="true" id="processingMark"><img alt="" src="logo.png"/></div>
+<div>
+<div aria-live="polite" class="empty" id="output">Your optimised communication will appear here.</div>
+</div>
+</section>
+<div class="actions"><button id="blandifyButton" type="button">Conform</button><button id="copyButton" type="button">Copy approved version</button></div>
+<div aria-live="polite" id="status"></div><div id="error" role="alert"></div>
+<aside id="report"><dl><dt>Humanity remaining</dt><dd>4%</dd><dt>Personality detected</dt><dd>MINIMAL</dd><dt>Nuance removed</dt><dd>98%</dd><dt>Generic alignment</dt><dd>OPTIMAL</dd></dl><p class="linkedin">Ready to post on LinkedIn.</p></aside>
+</main>
+<script>
+const input=document.querySelector('#input');
+const output=document.querySelector('#output');
+const blandifyButton=document.querySelector('#blandifyButton');
+const copyButton=document.querySelector('#copyButton');
+const status=document.querySelector('#status');
+const error=document.querySelector('#error');
+const report=document.querySelector('#report');
+const processingMark=document.querySelector('#processingMark');
+
+const loadingMessages=[
+  'Initialising language model...',
+  'Detecting personality...',
+  'Removing human characteristics...',
+  'Flattening emotional variance...',
+  'Standardising communication patterns...',
+  'Optimising for professional ambiguity...',
+  'Finalising acceptable output...'
+];
+
+const countWords=value=>{
+  const t=value.trim();
+  return t?t.split(/\s+/).length:0;
+};
+
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+function shuffledMessages(){
+  return [...loadingMessages].sort(()=>Math.random()-.5).slice(0,5);
+}
+
+async function runLoadingSequence(){
+  await wait(350);
+  for(const message of shuffledMessages()){
+    status.textContent=message;
+    await wait(1050);
+  }
+}
+
+async function blandifyText(text){
+  const response=await fetch('/api/blandify',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text})
+  });
+
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(data.error||'Blandification failed.');
+  }
+
+  return data.text;
+}
+
+async function handleBlandify(){
+  const text=input.value.trim();
+  const words=countWords(text);
+
+  error.style.display='none';
+  report.style.display='none';
+  copyButton.style.display='none';
+
+  if(!text){
+    error.textContent='Paste some writing first.';
+    error.style.display='block';
+    input.focus();
+    return;
+  }
+
+  if(words>250){
+    error.textContent='Please keep the original to 250 words or fewer.';
+    error.style.display='block';
+    input.focus();
+    return;
+  }
+
+  blandifyButton.disabled=true;
+  blandifyButton.textContent='Conforming...';
+  output.classList.add('empty');
+  output.textContent='Conformity pending...';
+  processingMark?.classList.add('is-processing');
+
+  try{
+    const[blandified]=await Promise.all([
+      blandifyText(text),
+      runLoadingSequence()
+    ]);
+
+    status.textContent='✓ Blandification complete.';
+    await wait(900);
+
+    output.textContent=blandified;
+    output.classList.remove('empty');
+    report.style.display='block';
+    copyButton.style.display='inline-block';
+    status.textContent='';
+    blandifyButton.textContent='Conform further';
+  }catch(caughtError){
+    output.textContent='Your optimised communication will appear here.';
+    output.classList.add('empty');
+    status.textContent='';
+    error.textContent=caughtError.message;
+    error.style.display='block';
+    blandifyButton.textContent='Conform';
+  }finally{
+    blandifyButton.disabled=false;
+    processingMark?.classList.remove('is-processing');
+  }
+}
+
+async function handleCopy(){
+  await navigator.clipboard.writeText(output.textContent);
+  copyButton.textContent='Copied';
+  setTimeout(()=>copyButton.textContent='Copy approved version',1400);
+}
+
+blandifyButton.addEventListener('click',handleBlandify);
+copyButton.addEventListener('click',handleCopy);
+</script>
+</body>
+</html>
