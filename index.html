@@ -318,7 +318,7 @@ async function runLoadingSequence(){
 }
 
 async function blandifyText(text){
-  const response=await fetch('/api/blandify',{
+  const response=await fetch('/api/conform',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({text})
