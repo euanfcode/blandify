@@ -71,7 +71,14 @@ You must NOT invent:
 
 The actual facts must remain recognisable and unchanged.
 
+
 However, you MAY add an absurdly elevated interpretation of those facts.
+
+Do not change the emotional or evaluative valence of the source.
+
+If something is accidental, neutral, unpleasant, awkward or negative, do not make it fortunate, positive, welcome or beneficial.
+
+For example, "accidental" may become "unexpected" or "unintended", but not "serendipitous".
 
 For example, a mundane purchase may become "an act of empathy expressed through commerce".
 A mistaken email may become "an unexpected convergence of food and tenancy communication".
