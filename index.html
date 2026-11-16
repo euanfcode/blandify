@@ -5,13 +5,20 @@
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="Blandify helps you sound like everyone else." name="description"/>
 <title>Blandify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{--background:#f7f5ef;--panel:#fbfaf7;--text:#111;--muted:#686868;--border:#1b1b1b;--soft-border:#d8d5cc}
 *{box-sizing:border-box}
 body{margin:0;background:var(--background);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 main{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:42px 0 56px}
 .brand{display:flex;align-items:center;margin-bottom:56px}
-h1{margin:0;font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-size:clamp(56px,8vw,86px);font-weight:500;letter-spacing:-.04em;line-height:.95}
+h1{margin:0;font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-size:clamp(56px,8vw,86px);font-weight:500;line-height:.95}
+.wordmark{display:inline-flex;align-items:flex-end;white-space:nowrap}
+.wordmark-b{width:.69em;height:.94em;flex:none;overflow:visible;margin-right:-.045em;transform:translateY(-.015em)}
+.wordmark-b text{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-size:100px;font-weight:500;fill:currentColor}
+.wordmark-rest{letter-spacing:-.04em}
 .workspace{display:grid;grid-template-columns:1fr 110px 1fr;gap:24px;align-items:center}
 textarea,#output{display:block;width:100%;height:300px;min-height:300px;padding:22px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:23px;line-height:1.45}
 textarea{resize:none;overflow-y:auto}
@@ -49,7 +56,7 @@ button:disabled{cursor:wait}
 </head>
 <body>
 <main>
-<header><div class="brand"><h1>Blandify</h1></div></header>
+<header><div class="brand"><h1 class="wordmark" aria-label="Blandify"><svg class="wordmark-b" viewBox="0 0 72 100" aria-hidden="true" focusable="false"><defs><clipPath id="b-top"><rect x="-8" y="0" width="90" height="31"/></clipPath><clipPath id="b-mid"><rect x="-8" y="33" width="90" height="32"/></clipPath><clipPath id="b-bot"><rect x="-8" y="67" width="90" height="33"/></clipPath></defs><text x="-1" y="86" clip-path="url(#b-top)">B</text><text x="0.8" y="86" clip-path="url(#b-mid)">B</text><text x="-0.2" y="86" clip-path="url(#b-bot)">B</text></svg><span class="wordmark-rest">landify</span></h1></div></header>
 <section aria-label="Blandify writing tool" class="workspace">
 <div><textarea aria-label="Original writing" id="input" maxlength="2500" placeholder="Give me your human writing."></textarea></div>
 <div aria-hidden="true" id="processingMark"><img alt="" src="logo.png"/></div>
