@@ -12,9 +12,6 @@ body{margin:0;background:var(--background);color:var(--text);font-family:Arial,H
 main{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:42px 0 56px}
 .brand{display:flex;align-items:center;margin-bottom:56px}
 h1{margin:0;font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-size:clamp(56px,8vw,86px);font-weight:500;letter-spacing:-.04em;line-height:.95}
-.wordmark-a{display:inline-block;font-style:italic;transform:translateY(.01em) scaleX(.92);transform-origin:center}
-.wordmark-f{display:inline-block;position:relative;transform:translateY(-.012em) scaleX(.97);transform-origin:center}
-.wordmark-f::after{content:"";position:absolute;width:.28em;height:1.5px;background:currentColor;left:.38em;top:.43em;transform:rotate(-8deg);transform-origin:left center}
 .workspace{display:grid;grid-template-columns:1fr 110px 1fr;gap:24px;align-items:center}
 textarea,#output{display:block;width:100%;height:300px;min-height:300px;padding:22px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:23px;line-height:1.45}
 textarea{resize:none;overflow-y:auto}
@@ -52,7 +49,7 @@ button:disabled{cursor:wait}
 </head>
 <body>
 <main>
-<header><div class="brand"><h1 aria-label="Blandify">Bl<span class="wordmark-a" aria-hidden="true">a</span>ndi<span class="wordmark-f" aria-hidden="true">f</span>y</h1></div></header>
+<header><div class="brand"><h1>Blandify</h1></div></header>
 <section aria-label="Blandify writing tool" class="workspace">
 <div><textarea aria-label="Original writing" id="input" maxlength="2500" placeholder="Give me your human writing."></textarea></div>
 <div aria-hidden="true" id="processingMark"><img alt="" src="logo.png"/></div>
