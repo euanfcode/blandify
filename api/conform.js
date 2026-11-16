@@ -1,5 +1,53 @@
 const MAX_WORDS = 250;
 const MAX_ATTEMPTS = 2;
+const MAX_CHARACTERS = 6000;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
+
+const rateLimitStore =
+  globalThis.__blandifyRateLimitStore ||
+  (globalThis.__blandifyRateLimitStore = new Map());
+
+function getClientIp(request) {
+  const forwarded = request.headers["x-forwarded-for"];
+  const value = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  return String(value || request.socket?.remoteAddress || "unknown")
+    .split(",")[0]
+    .trim();
+}
+
+function isSameOriginRequest(request) {
+  const origin = request.headers.origin;
+  if (!origin) return true;
+
+  try {
+    return new URL(origin).host === request.headers.host;
+  } catch {
+    return false;
+  }
+}
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const current = rateLimitStore.get(ip);
+
+  if (!current || now - current.startedAt >= RATE_LIMIT_WINDOW_MS) {
+    rateLimitStore.set(ip, { count: 1, startedAt: now });
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
+    const remaining = RATE_LIMIT_WINDOW_MS - (now - current.startedAt);
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.max(1, Math.ceil(remaining / 1000))
+    };
+  }
+
+  current.count += 1;
+  rateLimitStore.set(ip, current);
+  return { allowed: true, retryAfterSeconds: 0 };
+}
 
 function countWords(value) {
   const trimmed = value.trim();
@@ -64,15 +112,36 @@ async function createRewrite({ text, instructions }) {
 }
 
 export default async function handler(request, response) {
+  response.setHeader("Cache-Control", "no-store");
+  response.setHeader("X-Content-Type-Options", "nosniff");
+
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
     return response.status(405).json({ error: "Method not allowed." });
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return response.status(403).json({ error: "Request origin not allowed." });
+  }
+
+  const clientIp = getClientIp(request);
+  const limit = checkRateLimit(clientIp);
+
+  if (!limit.allowed) {
+    response.setHeader("Retry-After", String(limit.retryAfterSeconds));
+    return response.status(429).json({
+      error: "Too many requests. Please try again shortly."
+    });
   }
 
   const text = typeof request.body?.text === "string" ? request.body.text.trim() : "";
 
   if (!text) {
     return response.status(400).json({ error: "No writing was supplied." });
+  }
+
+  if (text.length > MAX_CHARACTERS) {
+    return response.status(400).json({ error: "The supplied text is too long." });
   }
 
   const originalWordCount = countWords(text);
