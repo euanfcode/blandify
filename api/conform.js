@@ -1,394 +1,538 @@
-import OpenAI from "openai";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Blandify helps you sound like everyone else." name="description"/>
+<title>Blandify</title>
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const MAX_WORDS = 250;
-const MAX_ATTEMPTS = 3;
-
-function countWords(value) {
-  const trimmed = value.trim();
-  return trimmed ? trimmed.split(/\s+/).length : 0;
+<style>
+:root{
+  --background:#f7f5ef;
+  --panel:#fbfaf7;
+  --text:#111;
+  --muted:#686868;
+  --border:#1b1b1b;
+  --soft-border:#d8d5cc;
 }
 
-function cleanOutput(value) {
-  return value.trim().replace(/\s*—\s*/g, "—");
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--background);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
 }
 
-export default async function handler(request, response) {
-  if (request.method !== "POST") {
-    response.setHeader("Allow", "POST");
+main{
+  width:min(1180px,calc(100% - 40px));
+  margin:0 auto;
+  padding:42px 0 56px;
+}
 
-    return response.status(405).json({
-      error: "Method not allowed."
-    });
+.brand{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin-bottom:56px;
+}
+
+.brand img{
+  width:92px;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+
+h1{
+  margin:0;
+  font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  font-size:clamp(56px,8vw,86px);
+  font-weight:500;
+  letter-spacing:-.04em;
+  line-height:.95;
+}
+
+.workspace{
+  display:grid;
+  grid-template-columns:1fr 110px 1fr;
+  gap:24px;
+  align-items:center;
+}
+
+textarea,#output{
+  display:block;
+  width:100%;
+  height:300px;
+  min-height:300px;
+  padding:22px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+}
+
+textarea{
+  resize:none;
+  overflow-y:auto;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:23px;
+  line-height:1.45;
+}
+
+textarea:focus{
+  outline:2px solid var(--text);
+  outline-offset:3px;
+}
+
+#output{
+  font-family:Arial,Helvetica,sans-serif;
+  overflow-y:auto;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+  font-size:23px;
+  line-height:1.45;
+}
+
+#output.empty{
+  color:#88867f;
+}
+
+#processingMark{
+  height:300px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+
+#processingMark img{
+  width:96px;
+  height:96px;
+  object-fit:contain;
+  opacity:.9;
+  transform:scale(1);
+}
+
+#processingMark.is-processing img{
+  animation:blandifyProcessing 2.25s ease-in-out infinite;
+}
+
+@keyframes blandifyProcessing{
+  0%,100%{
+    opacity:.78;
+    transform:scale(.94);
   }
 
-  const text =
-    typeof request.body?.text === "string"
-      ? request.body.text.trim()
-      : "";
-
-  if (!text) {
-    return response.status(400).json({
-      error: "No writing was supplied."
-    });
-  }
-
-  const originalWordCount = countWords(text);
-
-  if (originalWordCount > MAX_WORDS) {
-    return response.status(400).json({
-      error: "Please keep the original to 250 words or fewer."
-    });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return response.status(500).json({
-      error: "The OpenAI API key has not been configured."
-    });
-  }
-
-  /*
-    Very short inputs need a little extra room for Blandify to
-    over-express simple ideas. Longer inputs remain capped at 150%.
-  */
-  const maximumWordCount =
-    originalWordCount < 20
-      ? Math.ceil(originalWordCount * 1.8)
-      : Math.ceil(originalWordCount * 1.5);
-
-  const instructions = `
-You are Blandify.
-
-Rewrite the user's text so that it sounds unmistakably AI-written.
-
-The factual event must remain the same, but the language should become more polished, abstract, formal, over-explained and unnecessarily significant.
-
-CORE PRINCIPLE:
-
-PRESERVE THE EVENT. INFLATE THE LANGUAGE AND ITS SIGNIFICANCE.
-
-The reader should still be able to identify exactly what happened in the original.
-
-You may pompously interpret, abstract, elevate or reframe what the event represents, reflects or amounts to.
-
-You must NOT invent:
-- another event
-- another action
-- another person
-- another object
-- another outcome
-- another consequence
-- another factual detail
-- something that happened before or afterwards unless it appears in the source
-
-The factual content must remain recognisable and unchanged.
-
-You MAY add an absurdly elevated interpretation of those existing facts.
-
-For example:
-- a mundane purchase can become "an act of empathy expressed through commerce"
-- a mistaken email can become "an unexpected convergence of nourishment and residential correspondence"
-- crying before a meeting can become "a defined period of emotional release preceding a professional commitment"
-
-EMOTIONAL AND EVALUATIVE FIDELITY:
-
-Do not change the emotional or evaluative valence of the source.
-
-If something is accidental, neutral, unpleasant, awkward, negative or unwanted, do not turn it into something fortunate, positive, welcome, beneficial or inspiring.
-
-For example:
-- "accidental" may become "unexpected", "unintended" or "inadvertent"
-- it must NOT become "serendipitous", "fortunate" or "beneficial"
-
-UNNECESSARY REPHRASING:
-
-Do not merely replace ordinary words with slightly fancier synonyms.
-
-Where useful, unnecessarily unpack simple words and phrases into more elaborate but semantically faithful descriptions.
-
-Examples:
-
-"photo of my lunch"
-→ "a still image of my midday meal"
-
-"cried"
-→ "experienced a period of sustained weeping"
-
-"bought seventeen peaches"
-→ "acquired a total of seventeen individual peaches"
-
-"went into the meeting"
-→ "proceeded inside to attend the meeting"
-
-"looked disappointed"
-→ "appeared visibly disappointed"
-
-"my car"
-→ "the vehicle"
-
-"sent an email"
-→ "transmitted an electronic message"
-
-Use this selectively.
-
-The aim is not to make every noun and verb bizarre. It is to create the recognisable AI habit of needlessly re-describing something that was already perfectly clear.
-
-Do not add factual detail while expanding the wording.
-
-GRAMMAR:
-
-Keep the grammar idiomatic and correct even when the vocabulary is over-formal.
-
-Do not distort ordinary verb constructions simply to sound sophisticated.
-
-For example:
-
-Correct:
-"transmitted a photograph to my landlord"
-
-Incorrect:
-"transmitted my landlord a photograph"
-
-The writing should sound artificial because it is overworked, not because it is grammatically broken.
-
-STYLE:
-
-Write like an over-polished general-purpose LLM trying slightly too hard to improve perfectly ordinary prose.
-
-Use a mixture of recognisable AI-writing tendencies:
-
-- unnecessary abstraction
-- needless formality
-- circumlocution
-- nominalisation
-- elevated synonyms
-- over-explicit descriptions
-- over-polished syntax
-- inflated significance
-- unnecessary conceptual framing
-- smooth but slightly unnatural transitions
-- explanatory tails
-- emotionally flattened or clinical phrasing
-- excessive neatness
-- turning mundane observations into broader-sounding concepts
-
-Useful AI-style verbs and constructions include:
-
-- represents
-- reflects
-- underscores
-- highlights
-- signals
-- marks
-- constitutes
-- serves as
-- can be understood as
-- ultimately
-- in many ways
-- at its core
-- in this context
-- a form of
-- an instance of
-- an intersection of
-- a convergence of
-
-Use these where they genuinely help create the AI effect.
-
-Do not cram them all into every answer.
-
-Do not use the same tricks in exactly the same combination every time.
-
-FALSE CONTRAST:
-
-Where the source naturally allows it, include one recognisably AI-style false contrast or inflated reframing.
-
-Possible forms include:
-
-"This isn't simply X. It's Y."
-
-"This wasn't just X. It was Y."
-
-"It's not X. It's Y."
-
-"X wasn't merely Y—it was Z."
-
-"X doesn't have a Y problem. It has a Z problem."
-
-"More than X, it was Y."
-
-The second part should elevate or abstract the same underlying event rather than simply repeat it.
-
-Bad:
-
-"It wasn't accidental. It was inadvertent."
-
-This merely repeats the same idea.
-
-Better:
-
-"It wasn't simply a fruit purchase. It was empathy expressed through commerce."
-
-The second half reframes the existing motivation at a needlessly elevated level.
-
-Do not force a false contrast into every rewrite.
-
-EM DASHES:
-
-Every rewrite must contain at least one em dash.
-
-Always write em dashes with no spaces on either side—like this.
-
-Never write:
-
-"word — word"
-
-Always write:
-
-"word—word"
-
-TONE:
-
-Do not automatically make everything sound like LinkedIn, management consultancy, advertising copy or startup language.
-
-Blandify should sound like AI writing in general.
-
-Professional jargon can appear when:
-- the source itself concerns professional or business life
-- a small amount of misplaced professional language makes an ordinary event sound amusingly over-engineered
-
-Do not automatically turn:
-- people into "stakeholders"
-- actions into "strategies"
-- events into "case studies"
-- experiences into "journeys"
-- objects into "assets"
-- situations into "frameworks"
-
-The humour should come primarily from AI-style rewriting, not from randomly converting everything into corporate language.
-
-LENGTH:
-
-The original contains ${originalWordCount} words.
-
-The rewrite must contain no more than ${maximumWordCount} words.
-
-This is an absolute maximum, not a target.
-
-Use additional words for:
-- unnecessary rephrasing
-- abstraction
-- inflated interpretation
-- over-explicit description
-
-Do NOT use them merely to repeat the same information twice.
-
-GOOD EXAMPLES:
-
-Source:
-"I accidentally emailed my landlord a photo of my lunch."
-
-Blandified:
-"I inadvertently emailed my landlord a still image of my midday meal—an unexpected fusion of nourishment and residential correspondence."
-
-Source:
-"I cried in the car for ten minutes before going into the meeting."
-
-Blandified:
-"I spent approximately ten minutes engaged in sustained weeping inside the vehicle before entering the meeting—a defined period of emotional release preceding a professional commitment."
-
-Source:
-"On Tuesday I bought seventeen peaches because the woman in the market looked disappointed."
-
-Blandified:
-"On Tuesday, I acquired seventeen individual peaches because the market vendor appeared visibly disappointed—an act of empathy expressed through produce-based commerce."
-
-Source:
-"The moon looked like a bruised peach hanging over the motorway."
-
-Blandified:
-"The moon presented itself as a bruised peach suspended above the motorway—a striking convergence of celestial observation and damaged-fruit imagery."
-
-FINAL CHECK:
-
-Before returning the answer, silently check:
-
-1. Is the actual event still the same?
-2. Are all concrete factual details faithful to the source?
-3. Have I invented any new event, action, outcome or consequence?
-4. Have I preserved the emotional or evaluative direction of the original?
-5. Have I unnecessarily rephrased at least some ordinary language where appropriate?
-6. Have I elevated or abstracted the event rather than merely repeating it?
-7. Is the grammar natural and idiomatic?
-8. Does the result contain several recognisable AI-writing tendencies?
-9. Does it contain an em dash with no spaces around it?
-10. Is it within ${maximumWordCount} words?
-
-Return only the rewritten text.
-
-No heading.
-No quotation marks.
-No hashtags.
-No explanation.
-`.trim();
-
-  try {
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
-      const retryInstruction =
-        attempt === 1
-          ? ""
-          : `
-
-Your previous answer exceeded the ${maximumWordCount}-word limit.
-
-Rewrite the ORIGINAL text again from scratch.
-
-Preserve the same event.
-
-Keep the unnecessary rephrasing and AI-style abstraction, but compress them.
-
-Do not merely repeat the original information in different words.
-
-The final answer must contain no more than ${maximumWordCount} words.`;
-
-      const result = await client.responses.create({
-        model: "gpt-4.1-mini",
-        instructions: instructions + retryInstruction,
-        input: text,
-        max_output_tokens: 700
-      });
-
-      const blandifiedText = cleanOutput(result.output_text || "");
-
-      if (
-        blandifiedText &&
-        countWords(blandifiedText) <= maximumWordCount
-      ) {
-        return response.status(200).json({
-          text: blandifiedText
-        });
-      }
-    }
-
-    return response.status(502).json({
-      error: "Blandify could not produce a concise enough rewrite. Please try again."
-    });
-
-  } catch (error) {
-    console.error("Blandify API error:", error);
-
-    const status =
-      Number.isInteger(error?.status) && error.status >= 400
-        ? error.status
-        : 500;
-
-    const message =
-      typeof error?.message === "string"
-        ? error.message
-        : "Blandify encountered a temporary problem.";
-
-    return response.status(status).json({
-      error: message
-    });
+  50%{
+    opacity:1;
+    transform:scale(1.08);
   }
 }
+
+.actions{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:22px;
+}
+
+button{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--text);
+  padding:14px 24px;
+  background:var(--text);
+  color:#fff;
+  font:inherit;
+  font-size:14px;
+  cursor:pointer;
+  transition:background .2s ease,color .2s ease,transform .2s ease;
+}
+
+button:hover{
+  background:transparent;
+  color:var(--text);
+}
+
+button:disabled{
+  cursor:wait;
+  opacity:.5;
+}
+
+#blandifyButton.is-processing{
+  opacity:1;
+  background:var(--text);
+  color:#fff;
+  animation:conformPulse 1.7s ease-in-out infinite;
+}
+
+#blandifyButton.is-processing::after{
+  content:"";
+  position:absolute;
+  top:-55%;
+  left:-22%;
+  width:16%;
+  height:210%;
+  background:rgba(255,255,255,.34);
+  filter:blur(3px);
+  transform:skewX(-18deg);
+  animation:conformSweep 1.55s ease-in-out infinite;
+  pointer-events:none;
+}
+
+@keyframes conformPulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:0 0 0 rgba(17,17,17,0);
+  }
+
+  50%{
+    transform:scale(1.025);
+    box-shadow:0 0 18px rgba(17,17,17,.14);
+  }
+}
+
+@keyframes conformSweep{
+  0%{
+    left:-22%;
+    opacity:0;
+  }
+
+  18%{
+    opacity:.9;
+  }
+
+  58%{
+    opacity:.9;
+  }
+
+  78%,100%{
+    left:112%;
+    opacity:0;
+  }
+}
+
+#copyButton{
+  display:none;
+  background:transparent;
+  color:var(--text);
+}
+
+#copyButton:hover{
+  background:var(--text);
+  color:#fff;
+}
+
+#status{
+  min-height:22px;
+  margin-top:18px;
+  color:var(--muted);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:15px;
+  font-style:italic;
+}
+
+#error{
+  display:none;
+  margin-top:16px;
+  font-size:14px;
+}
+
+#report{
+  display:none;
+  max-width:540px;
+  margin-top:26px;
+  border:1px solid var(--soft-border);
+  padding:18px;
+  font-size:13px;
+  line-height:1.8;
+}
+
+#report dl{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:4px 24px;
+  margin:0;
+}
+
+#report dt,#report dd{margin:0}
+
+#report dd{
+  font-weight:700;
+}
+
+.linkedin{
+  margin:16px 0 0;
+  padding-top:14px;
+  border-top:1px solid var(--soft-border);
+  font-weight:700;
+}
+
+@media(prefers-reduced-motion:reduce){
+  #processingMark.is-processing img,
+  #blandifyButton.is-processing,
+  #blandifyButton.is-processing::after{
+    animation:none;
+  }
+}
+
+@media(max-width:760px){
+  main{
+    width:min(100% - 28px,1180px);
+    padding-top:28px;
+  }
+
+  .brand{
+    margin-bottom:36px;
+  }
+
+  .brand img{
+    width:76px;
+    height:auto;
+  }
+
+  .workspace{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+
+  #processingMark{
+    height:80px;
+  }
+
+  #processingMark img{
+    width:72px;
+    height:72px;
+  }
+
+  textarea,#output{
+    height:230px;
+    min-height:230px;
+  }
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<header>
+<div class="brand">
+<img alt="" onerror="this.remove()" src="logo.png"/>
+<h1>Blandify</h1>
+</div>
+</header>
+
+<section aria-label="Blandify writing tool" class="workspace">
+
+<div>
+<textarea
+  aria-label="Original writing"
+  id="input"
+  maxlength="2500"
+  placeholder="Paste your writing to begin"></textarea>
+</div>
+
+<div aria-hidden="true" id="processingMark">
+<img alt="" src="logo.png"/>
+</div>
+
+<div>
+<div
+  aria-live="polite"
+  class="empty"
+  id="output">Your optimised communication will appear here.</div>
+</div>
+
+</section>
+
+<div class="actions">
+<button id="blandifyButton" type="button">Conform</button>
+<button id="copyButton" type="button">Copy approved version</button>
+</div>
+
+<div aria-live="polite" id="status"></div>
+<div id="error" role="alert"></div>
+
+<aside id="report">
+<dl>
+<dt>Humanity remaining</dt><dd>4%</dd>
+<dt>Personality detected</dt><dd>MINIMAL</dd>
+<dt>Nuance removed</dt><dd>98%</dd>
+<dt>Generic alignment</dt><dd>OPTIMAL</dd>
+</dl>
+
+<p class="linkedin">Ready to post on LinkedIn.</p>
+</aside>
+
+</main>
+
+<script>
+const input=document.querySelector('#input');
+const output=document.querySelector('#output');
+const blandifyButton=document.querySelector('#blandifyButton');
+const copyButton=document.querySelector('#copyButton');
+const status=document.querySelector('#status');
+const error=document.querySelector('#error');
+const report=document.querySelector('#report');
+const processingMark=document.querySelector('#processingMark');
+
+const loadingMessages=[
+  'Initialising language model...',
+  'Detecting personality...',
+  'Removing human characteristics...',
+  'Flattening emotional variance...',
+  'Standardising communication patterns...',
+  'Optimising for professional ambiguity...',
+  'Finalising acceptable output...'
+];
+
+const countWords=value=>{
+  const t=value.trim();
+  return t?t.split(/\s+/).length:0;
+};
+
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+function shuffledMessages(){
+  return [...loadingMessages]
+    .sort(()=>Math.random()-.5)
+    .slice(0,5);
+}
+
+async function runLoadingSequence(){
+  await wait(350);
+
+  for(const message of shuffledMessages()){
+    status.textContent=message;
+    await wait(1050);
+  }
+}
+
+async function blandifyText(text){
+  const response=await fetch('/api/conform',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({text})
+  });
+
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(
+      data.error||'Blandification failed.'
+    );
+  }
+
+  return data.text;
+}
+
+async function handleBlandify(){
+  const text=input.value.trim();
+  const words=countWords(text);
+
+  error.style.display='none';
+  report.style.display='none';
+  copyButton.style.display='none';
+
+  if(!text){
+    error.textContent='Paste some writing first.';
+    error.style.display='block';
+    input.focus();
+    return;
+  }
+
+  if(words>250){
+    error.textContent=
+      'Please keep the original to 250 words or fewer.';
+
+    error.style.display='block';
+    input.focus();
+    return;
+  }
+
+  blandifyButton.disabled=true;
+  blandifyButton.classList.add('is-processing');
+  blandifyButton.textContent='Conforming...';
+
+  output.classList.add('empty');
+  output.textContent='Conformity pending...';
+
+  processingMark?.classList.add('is-processing');
+
+  try{
+    const[blandified]=await Promise.all([
+      blandifyText(text),
+      runLoadingSequence()
+    ]);
+
+    status.textContent='✓ Blandification complete.';
+
+    await wait(900);
+
+    output.textContent=blandified;
+    output.classList.remove('empty');
+
+    report.style.display='block';
+    copyButton.style.display='inline-block';
+
+    status.textContent='';
+    blandifyButton.textContent='Conform further';
+
+  }catch(caughtError){
+
+    output.textContent=
+      'Your optimised communication will appear here.';
+
+    output.classList.add('empty');
+
+    status.textContent='';
+
+    error.textContent=caughtError.message;
+    error.style.display='block';
+
+    blandifyButton.textContent='Conform';
+
+  }finally{
+
+    blandifyButton.disabled=false;
+
+    blandifyButton.classList.remove(
+      'is-processing'
+    );
+
+    processingMark?.classList.remove(
+      'is-processing'
+    );
+  }
+}
+
+async function handleCopy(){
+  await navigator.clipboard.writeText(
+    output.textContent
+  );
+
+  copyButton.textContent='Copied';
+
+  setTimeout(
+    ()=>copyButton.textContent='Copy approved version',
+    1400
+  );
+}
+
+blandifyButton.addEventListener(
+  'click',
+  handleBlandify
+);
+
+copyButton.addEventListener(
+  'click',
+  handleCopy
+);
+</script>
+
+</body>
+</html>
