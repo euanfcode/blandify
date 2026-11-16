@@ -27,12 +27,14 @@ textarea:focus{outline:2px solid var(--text);outline-offset:3px}
 button{position:relative;overflow:hidden;border:1px solid var(--text);padding:14px 24px;background:var(--text);color:#fff;font:inherit;font-size:14px;cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease,box-shadow .2s ease}
 button:hover{background:transparent;color:var(--text)}
 button:disabled{cursor:wait}
-#blandifyButton.is-processing,#blandifyButton.is-processing:hover{opacity:1;color:#fff;background:#111;border-color:#111;animation:magicPulse 1.25s ease-in-out infinite;box-shadow:0 0 0 1px rgba(17,17,17,.12),0 0 22px rgba(17,17,17,.18)}
-#blandifyButton.is-processing::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 0%,transparent 34%,rgba(255,255,255,.18) 44%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.18) 56%,transparent 66%,transparent 100%);transform:translateX(-140%);animation:magicSweep 1.15s ease-in-out infinite;pointer-events:none}
-#blandifyButton.is-processing::after{content:"✦";position:absolute;right:8px;top:3px;font-size:10px;opacity:.2;animation:magicSpark 1s ease-in-out infinite;pointer-events:none}
-@keyframes magicPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 1px rgba(17,17,17,.1),0 0 10px rgba(17,17,17,.08)}50%{transform:scale(1.045);box-shadow:0 0 0 4px rgba(17,17,17,.08),0 0 30px rgba(17,17,17,.28)}}
+#blandifyButton:not(.has-run){animation:magicPulse 1.8s ease-in-out infinite}
+#blandifyButton:not(.has-run)::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 0%,transparent 34%,rgba(255,255,255,.14) 44%,rgba(255,255,255,.92) 50%,rgba(255,255,255,.14) 56%,transparent 66%,transparent 100%);transform:translateX(-140%);animation:magicSweep 1.55s ease-in-out infinite;pointer-events:none}
+#blandifyButton:not(.has-run)::after{content:"✦";position:absolute;right:8px;top:3px;font-size:10px;opacity:.2;animation:magicSpark 1.35s ease-in-out infinite;pointer-events:none}
+#blandifyButton.is-processing,#blandifyButton.is-processing:hover{opacity:1;color:#fff;background:#111;border-color:#111;animation:none;box-shadow:none}
+#blandifyButton.is-processing::before,#blandifyButton.is-processing::after{content:none;animation:none}
+@keyframes magicPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 1px rgba(17,17,17,.08),0 0 8px rgba(17,17,17,.06)}50%{transform:scale(1.025);box-shadow:0 0 0 3px rgba(17,17,17,.06),0 0 20px rgba(17,17,17,.18)}}
 @keyframes magicSweep{0%{transform:translateX(-140%);opacity:0}18%{opacity:1}72%{opacity:1}100%{transform:translateX(140%);opacity:0}}
-@keyframes magicSpark{0%,100%{opacity:.15;transform:scale(.7) rotate(0deg)}50%{opacity:1;transform:scale(1.35) rotate(90deg)}}
+@keyframes magicSpark{0%,100%{opacity:.12;transform:scale(.7) rotate(0deg)}50%{opacity:.8;transform:scale(1.15) rotate(90deg)}}
 #copyButton{display:none;background:transparent;color:var(--text)}
 #copyButton:hover{background:var(--text);color:#fff}
 #status{min-height:22px;margin-top:18px;color:var(--muted);font-family:Georgia,"Times New Roman",serif;font-size:15px;font-style:italic}
@@ -42,7 +44,7 @@ button:disabled{cursor:wait}
 #report dt,#report dd{margin:0}
 #report dd{font-weight:700}
 .linkedin{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--soft-border);font-weight:700}
-@media(prefers-reduced-motion:reduce){#processingMark.is-processing img,#blandifyButton.is-processing,#blandifyButton.is-processing::before,#blandifyButton.is-processing::after{animation:none}}
+@media(prefers-reduced-motion:reduce){#processingMark.is-processing img,#blandifyButton:not(.has-run),#blandifyButton:not(.has-run)::before,#blandifyButton:not(.has-run)::after{animation:none}}
 @media(max-width:760px){main{width:min(100% - 28px,1180px);padding-top:28px}.brand{margin-bottom:36px}.brand img{width:76px;height:auto}.workspace{grid-template-columns:1fr;gap:18px}#processingMark{height:80px}#processingMark img{width:72px;height:72px}textarea,#output{height:230px;min-height:230px}}
 </style>
 </head>
@@ -87,6 +89,7 @@ async function handleBlandify(){
   error.style.display='none';report.style.display='none';copyButton.style.display='none';
   if(!text){error.textContent='Paste some writing first.';error.style.display='block';input.focus();return}
   if(words>250){error.textContent='Please keep the original to 250 words or fewer.';error.style.display='block';input.focus();return}
+  blandifyButton.classList.add('has-run');
   blandifyButton.disabled=true;
   blandifyButton.classList.add('is-processing');
   blandifyButton.textContent='Conforming ✦';
