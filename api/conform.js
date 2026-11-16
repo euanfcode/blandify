@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="Blandify helps you sound like everyone else." name="description"/>
+<meta
+  content="width=device-width, initial-scale=1"
+  name="viewport"
+/>
+
+<meta
+  content="Blandify helps you sound like everyone else."
+  name="description"
+/>
+
 <title>Blandify</title>
 
 <style>
+
 :root{
   --background:#f7f5ef;
   --panel:#fbfaf7;
@@ -16,7 +26,9 @@
   --soft-border:#d8d5cc;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -47,7 +59,12 @@ main{
 
 h1{
   margin:0;
-  font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  font-family:
+    "Cormorant Garamond",
+    Georgia,
+    "Times New Roman",
+    serif;
+
   font-size:clamp(56px,8vw,86px);
   font-weight:500;
   letter-spacing:-.04em;
@@ -61,7 +78,8 @@ h1{
   align-items:center;
 }
 
-textarea,#output{
+textarea,
+#output{
   display:block;
   width:100%;
   height:300px;
@@ -75,7 +93,11 @@ textarea,#output{
 textarea{
   resize:none;
   overflow-y:auto;
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size:23px;
   line-height:1.45;
 }
@@ -86,7 +108,6 @@ textarea:focus{
 }
 
 #output{
-  font-family:Arial,Helvetica,sans-serif;
   overflow-y:auto;
   overflow-wrap:anywhere;
   white-space:pre-wrap;
@@ -97,6 +118,9 @@ textarea:focus{
 #output.empty{
   color:#88867f;
 }
+
+
+/* CENTRE LOGO */
 
 #processingMark{
   height:300px;
@@ -115,20 +139,29 @@ textarea:focus{
 }
 
 #processingMark.is-processing img{
-  animation:blandifyProcessing 2.25s ease-in-out infinite;
+  animation:
+    blandifyProcessing
+    1.8s
+    ease-in-out
+    infinite;
 }
 
 @keyframes blandifyProcessing{
-  0%,100%{
-    opacity:.78;
-    transform:scale(.94);
+
+  0%,
+  100%{
+    opacity:.68;
+    transform:scale(.92);
   }
 
   50%{
     opacity:1;
-    transform:scale(1.08);
+    transform:scale(1.1);
   }
 }
+
+
+/* ACTIONS */
 
 .actions{
   display:flex;
@@ -139,7 +172,6 @@ textarea:focus{
 
 button{
   position:relative;
-  overflow:hidden;
   border:1px solid var(--text);
   padding:14px 24px;
   background:var(--text);
@@ -147,7 +179,12 @@ button{
   font:inherit;
   font-size:14px;
   cursor:pointer;
-  transition:background .2s ease,color .2s ease,transform .2s ease;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
 }
 
 button:hover{
@@ -157,61 +194,141 @@ button:hover{
 
 button:disabled{
   cursor:wait;
-  opacity:.5;
+}
+
+
+/* MAGICAL CONFORM BUTTON */
+
+#blandifyButton{
+  isolation:isolate;
+  overflow:visible;
 }
 
 #blandifyButton.is-processing{
-  opacity:1;
-  background:var(--text);
   color:#fff;
-  animation:conformPulse 1.7s ease-in-out infinite;
+  background:#111;
+  opacity:1;
+
+  animation:
+    magicPulse
+    1.35s
+    ease-in-out
+    infinite;
 }
+
+
+/* Animated glow around button */
+
+#blandifyButton.is-processing::before{
+  content:"";
+
+  position:absolute;
+  inset:-7px;
+
+  z-index:-2;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(255,255,255,0),
+      rgba(255,255,255,.9),
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.65),
+      rgba(255,255,255,0)
+    );
+
+  filter:blur(7px);
+  opacity:.78;
+
+  animation:
+    magicOrbit
+    1.6s
+    linear
+    infinite;
+}
+
+
+/* Moving shimmer across button */
 
 #blandifyButton.is-processing::after{
   content:"";
+
   position:absolute;
-  top:-55%;
-  left:-22%;
-  width:16%;
-  height:210%;
-  background:rgba(255,255,255,.34);
-  filter:blur(3px);
+
+  top:-2px;
+  left:-32%;
+
+  width:22%;
+  height:calc(100% + 4px);
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0),
+      rgba(255,255,255,.88),
+      rgba(255,255,255,0)
+    );
+
   transform:skewX(-18deg);
-  animation:conformSweep 1.55s ease-in-out infinite;
+
+  animation:
+    magicSweep
+    1.05s
+    ease-in-out
+    infinite;
+
   pointer-events:none;
 }
 
-@keyframes conformPulse{
-  0%,100%{
+@keyframes magicPulse{
+
+  0%,
+  100%{
     transform:scale(1);
-    box-shadow:0 0 0 rgba(17,17,17,0);
+
+    box-shadow:
+      0 0 0
+      rgba(17,17,17,0);
   }
 
   50%{
-    transform:scale(1.025);
-    box-shadow:0 0 18px rgba(17,17,17,.14);
+    transform:scale(1.045);
+
+    box-shadow:
+      0 0 28px
+      rgba(17,17,17,.27);
   }
 }
 
-@keyframes conformSweep{
+@keyframes magicOrbit{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+@keyframes magicSweep{
+
   0%{
-    left:-22%;
+    left:-32%;
     opacity:0;
   }
 
   18%{
-    opacity:.9;
+    opacity:1;
   }
 
-  58%{
-    opacity:.9;
+  70%{
+    opacity:1;
   }
 
-  78%,100%{
+  100%{
     left:112%;
     opacity:0;
   }
 }
+
+
+/* COPY */
 
 #copyButton{
   display:none;
@@ -224,11 +341,20 @@ button:disabled{
   color:#fff;
 }
 
+
+/* STATUS */
+
 #status{
   min-height:22px;
   margin-top:18px;
+
   color:var(--muted);
-  font-family:Georgia,"Times New Roman",serif;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
   font-size:15px;
   font-style:italic;
 }
@@ -239,24 +365,41 @@ button:disabled{
   font-size:14px;
 }
 
+
+/* REPORT */
+
 #report{
   display:none;
+
   max-width:540px;
+
   margin-top:26px;
-  border:1px solid var(--soft-border);
+
+  border:
+    1px solid
+    var(--soft-border);
+
   padding:18px;
+
   font-size:13px;
   line-height:1.8;
 }
 
 #report dl{
   display:grid;
-  grid-template-columns:1fr auto;
+
+  grid-template-columns:
+    1fr auto;
+
   gap:4px 24px;
+
   margin:0;
 }
 
-#report dt,#report dd{margin:0}
+#report dt,
+#report dd{
+  margin:0;
+}
 
 #report dd{
   font-weight:700;
@@ -264,22 +407,43 @@ button:disabled{
 
 .linkedin{
   margin:16px 0 0;
+
   padding-top:14px;
-  border-top:1px solid var(--soft-border);
+
+  border-top:
+    1px solid
+    var(--soft-border);
+
   font-weight:700;
 }
 
-@media(prefers-reduced-motion:reduce){
+
+/* ACCESSIBILITY */
+
+@media(
+  prefers-reduced-motion:reduce
+){
+
   #processingMark.is-processing img,
   #blandifyButton.is-processing,
+  #blandifyButton.is-processing::before,
   #blandifyButton.is-processing::after{
     animation:none;
   }
 }
 
+
+/* MOBILE */
+
 @media(max-width:760px){
+
   main{
-    width:min(100% - 28px,1180px);
+    width:
+      min(
+        100% - 28px,
+        1180px
+      );
+
     padding-top:28px;
   }
 
@@ -306,233 +470,562 @@ button:disabled{
     height:72px;
   }
 
-  textarea,#output{
+  textarea,
+  #output{
     height:230px;
     min-height:230px;
   }
 }
+
 </style>
 </head>
 
+
 <body>
+
 <main>
 
 <header>
+
 <div class="brand">
-<img alt="" onerror="this.remove()" src="logo.png"/>
+
+<img
+  alt=""
+  onerror="this.remove()"
+  src="logo.png"
+/>
+
 <h1>Blandify</h1>
+
 </div>
+
 </header>
 
-<section aria-label="Blandify writing tool" class="workspace">
+
+<section
+  aria-label="Blandify writing tool"
+  class="workspace"
+>
 
 <div>
+
 <textarea
   aria-label="Original writing"
   id="input"
   maxlength="2500"
-  placeholder="Paste your writing to begin"></textarea>
+  placeholder="Paste your writing to begin"
+></textarea>
+
 </div>
 
-<div aria-hidden="true" id="processingMark">
-<img alt="" src="logo.png"/>
+
+<div
+  aria-hidden="true"
+  id="processingMark"
+>
+
+<img
+  alt=""
+  src="logo.png"
+/>
+
 </div>
+
 
 <div>
+
 <div
   aria-live="polite"
   class="empty"
-  id="output">Your optimised communication will appear here.</div>
+  id="output"
+>
+Your optimised communication will appear here.
+</div>
+
 </div>
 
 </section>
 
+
 <div class="actions">
-<button id="blandifyButton" type="button">Conform</button>
-<button id="copyButton" type="button">Copy approved version</button>
+
+<button
+  id="blandifyButton"
+  type="button"
+>
+Conform
+</button>
+
+<button
+  id="copyButton"
+  type="button"
+>
+Copy approved version
+</button>
+
 </div>
 
-<div aria-live="polite" id="status"></div>
-<div id="error" role="alert"></div>
+
+<div
+  aria-live="polite"
+  id="status"
+></div>
+
+<div
+  id="error"
+  role="alert"
+></div>
+
 
 <aside id="report">
+
 <dl>
-<dt>Humanity remaining</dt><dd>4%</dd>
-<dt>Personality detected</dt><dd>MINIMAL</dd>
-<dt>Nuance removed</dt><dd>98%</dd>
-<dt>Generic alignment</dt><dd>OPTIMAL</dd>
+
+<dt>Humanity remaining</dt>
+<dd>4%</dd>
+
+<dt>Personality detected</dt>
+<dd>MINIMAL</dd>
+
+<dt>Nuance removed</dt>
+<dd>98%</dd>
+
+<dt>Generic alignment</dt>
+<dd>OPTIMAL</dd>
+
 </dl>
 
-<p class="linkedin">Ready to post on LinkedIn.</p>
+<p class="linkedin">
+Ready to post on LinkedIn.
+</p>
+
 </aside>
 
 </main>
 
-<script>
-const input=document.querySelector('#input');
-const output=document.querySelector('#output');
-const blandifyButton=document.querySelector('#blandifyButton');
-const copyButton=document.querySelector('#copyButton');
-const status=document.querySelector('#status');
-const error=document.querySelector('#error');
-const report=document.querySelector('#report');
-const processingMark=document.querySelector('#processingMark');
 
-const loadingMessages=[
+<script>
+
+const input =
+  document.querySelector(
+    '#input'
+  );
+
+const output =
+  document.querySelector(
+    '#output'
+  );
+
+const blandifyButton =
+  document.querySelector(
+    '#blandifyButton'
+  );
+
+const copyButton =
+  document.querySelector(
+    '#copyButton'
+  );
+
+const status =
+  document.querySelector(
+    '#status'
+  );
+
+const error =
+  document.querySelector(
+    '#error'
+  );
+
+const report =
+  document.querySelector(
+    '#report'
+  );
+
+const processingMark =
+  document.querySelector(
+    '#processingMark'
+  );
+
+
+const loadingMessages = [
+
   'Initialising language model...',
+
   'Detecting personality...',
+
   'Removing human characteristics...',
+
   'Flattening emotional variance...',
+
   'Standardising communication patterns...',
+
   'Optimising for professional ambiguity...',
+
   'Finalising acceptable output...'
+
 ];
 
-const countWords=value=>{
-  const t=value.trim();
-  return t?t.split(/\s+/).length:0;
+
+const countWords = value => {
+
+  const t =
+    value.trim();
+
+  return t
+    ? t.split(/\s+/).length
+    : 0;
+
 };
 
-const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+const wait =
+  ms =>
+    new Promise(
+      resolve =>
+        setTimeout(
+          resolve,
+          ms
+        )
+    );
+
 
 function shuffledMessages(){
-  return [...loadingMessages]
-    .sort(()=>Math.random()-.5)
-    .slice(0,5);
+
+  return [
+    ...loadingMessages
+  ]
+  .sort(
+    () =>
+      Math.random() - .5
+  )
+  .slice(
+    0,
+    5
+  );
+
 }
+
 
 async function runLoadingSequence(){
-  await wait(350);
 
-  for(const message of shuffledMessages()){
-    status.textContent=message;
-    await wait(1050);
+  await wait(
+    250
+  );
+
+  for(
+    const message
+    of shuffledMessages()
+  ){
+
+    status.textContent =
+      message;
+
+    await wait(
+      850
+    );
+
   }
+
 }
+
 
 async function blandifyText(text){
-  const response=await fetch('/api/conform',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json'
-    },
-    body:JSON.stringify({text})
-  });
 
-  const data=await response.json().catch(()=>({}));
+  const response =
+    await fetch(
+      '/api/conform',
+      {
 
-  if(!response.ok){
-    throw new Error(
-      data.error||'Blandification failed.'
+        method:'POST',
+
+        headers:{
+          'Content-Type':
+            'application/json'
+        },
+
+        body:
+          JSON.stringify({
+            text
+          })
+
+      }
     );
-  }
 
-  return data.text;
-}
 
-async function handleBlandify(){
-  const text=input.value.trim();
-  const words=countWords(text);
+  /*
+    Read text first.
 
-  error.style.display='none';
-  report.style.display='none';
-  copyButton.style.display='none';
+    This means that if Vercel returns
+    an HTML error page rather than JSON,
+    you will finally see the real error
+    instead of only "Blandification failed."
+  */
 
-  if(!text){
-    error.textContent='Paste some writing first.';
-    error.style.display='block';
-    input.focus();
-    return;
-  }
+  const raw =
+    await response.text();
 
-  if(words>250){
-    error.textContent=
-      'Please keep the original to 250 words or fewer.';
 
-    error.style.display='block';
-    input.focus();
-    return;
-  }
+  let data = {};
 
-  blandifyButton.disabled=true;
-  blandifyButton.classList.add('is-processing');
-  blandifyButton.textContent='Conforming...';
-
-  output.classList.add('empty');
-  output.textContent='Conformity pending...';
-
-  processingMark?.classList.add('is-processing');
 
   try{
-    const[blandified]=await Promise.all([
-      blandifyText(text),
-      runLoadingSequence()
-    ]);
 
-    status.textContent='✓ Blandification complete.';
+    data =
+      raw
+        ? JSON.parse(raw)
+        : {};
 
-    await wait(900);
+  }catch{
 
-    output.textContent=blandified;
-    output.classList.remove('empty');
+    data = {};
 
-    report.style.display='block';
-    copyButton.style.display='inline-block';
+  }
 
-    status.textContent='';
-    blandifyButton.textContent='Conform further';
+
+  if(!response.ok){
+
+    throw new Error(
+
+      data.error ||
+
+      raw ||
+
+      `Blandify request failed (${response.status}).`
+
+    );
+
+  }
+
+
+  if(
+    typeof data.text !==
+      'string' ||
+
+    !data.text.trim()
+  ){
+
+    throw new Error(
+      'Blandify returned an empty response.'
+    );
+
+  }
+
+
+  return data.text.trim();
+
+}
+
+
+async function handleBlandify(){
+
+  const text =
+    input.value.trim();
+
+  const words =
+    countWords(text);
+
+
+  error.style.display =
+    'none';
+
+  report.style.display =
+    'none';
+
+  copyButton.style.display =
+    'none';
+
+
+  if(!text){
+
+    error.textContent =
+      'Paste some writing first.';
+
+    error.style.display =
+      'block';
+
+    input.focus();
+
+    return;
+
+  }
+
+
+  if(words > 250){
+
+    error.textContent =
+      'Please keep the original to 250 words or fewer.';
+
+    error.style.display =
+      'block';
+
+    input.focus();
+
+    return;
+
+  }
+
+
+  blandifyButton.disabled =
+    true;
+
+  blandifyButton.classList.add(
+    'is-processing'
+  );
+
+  blandifyButton.textContent =
+    'Conforming...';
+
+
+  output.classList.add(
+    'empty'
+  );
+
+  output.textContent =
+    'Conformity pending...';
+
+
+  processingMark
+    ?.classList
+    .add(
+      'is-processing'
+    );
+
+
+  try{
+
+    const [
+      blandified
+    ] =
+      await Promise.all([
+
+        blandifyText(text),
+
+        runLoadingSequence()
+
+      ]);
+
+
+    status.textContent =
+      '✓ Blandification complete.';
+
+
+    await wait(
+      550
+    );
+
+
+    output.textContent =
+      blandified;
+
+    output.classList.remove(
+      'empty'
+    );
+
+
+    report.style.display =
+      'block';
+
+    copyButton.style.display =
+      'inline-block';
+
+
+    status.textContent =
+      '';
+
+    blandifyButton.textContent =
+      'Conform further';
+
 
   }catch(caughtError){
 
-    output.textContent=
+
+    output.textContent =
       'Your optimised communication will appear here.';
 
-    output.classList.add('empty');
 
-    status.textContent='';
+    output.classList.add(
+      'empty'
+    );
 
-    error.textContent=caughtError.message;
-    error.style.display='block';
 
-    blandifyButton.textContent='Conform';
+    status.textContent =
+      '';
+
+
+    error.textContent =
+      caughtError.message;
+
+
+    error.style.display =
+      'block';
+
+
+    blandifyButton.textContent =
+      'Conform';
+
 
   }finally{
 
-    blandifyButton.disabled=false;
+
+    blandifyButton.disabled =
+      false;
+
 
     blandifyButton.classList.remove(
       'is-processing'
     );
 
-    processingMark?.classList.remove(
-      'is-processing'
-    );
+
+    processingMark
+      ?.classList
+      .remove(
+        'is-processing'
+      );
+
   }
+
 }
 
+
 async function handleCopy(){
+
   await navigator.clipboard.writeText(
     output.textContent
   );
 
-  copyButton.textContent='Copied';
+
+  copyButton.textContent =
+    'Copied';
+
 
   setTimeout(
-    ()=>copyButton.textContent='Copy approved version',
+
+    () =>
+      copyButton.textContent =
+        'Copy approved version',
+
     1400
+
   );
+
 }
 
-blandifyButton.addEventListener(
-  'click',
-  handleBlandify
-);
 
-copyButton.addEventListener(
-  'click',
-  handleCopy
-);
+blandifyButton
+  .addEventListener(
+    'click',
+    handleBlandify
+  );
+
+
+copyButton
+  .addEventListener(
+    'click',
+    handleCopy
+  );
+
 </script>
 
 </body>
+
 </html>
